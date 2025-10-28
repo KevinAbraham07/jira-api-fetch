@@ -100,7 +100,7 @@ export default function Analytics() {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <h1 className="text-3xl font-bold text-center mb-10">
-        📊 SmartSprint – Agile Analytics Dashboard
+        Sprint Insights & Delivery Analytics
       </h1>
 
       {risk && (
@@ -163,7 +163,7 @@ export default function Analytics() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10 max-w-5xl mx-auto">
         <div className="bg-white p-6 rounded-2xl shadow-md text-center">
           <h3 className="text-gray-500 font-semibold mb-2">Total Tasks</h3>
-          <p className="text-4xl font-bold text-blue-600">{totalTasks}</p>
+          <p className="text-4xl font-bold text-purple-500">{totalTasks}</p>
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-md text-center">
           <h3 className="text-gray-500 font-semibold mb-2">To Do</h3>
@@ -181,8 +181,8 @@ export default function Analytics() {
         </div>
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {/* Charts - First Row: Issue Status Distribution and Issue Types in same row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         <div className="bg-white shadow-lg rounded-2xl p-6">
           <h2 className="text-xl font-semibold mb-4 text-center">
             Issue Status Distribution
@@ -205,24 +205,23 @@ export default function Analytics() {
                   />
                 ))}
               </Pie>
-              <Tooltip />
-              <Legend />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "rgba(15, 23, 42, 0.95)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: "8px",
+                  color: "#e2e8f0",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                }}
+                labelStyle={{
+                  color: "#e2e8f0",
+                  fontWeight: "600",
+                }}
+                itemStyle={{ color: "#cbd5e1" }}
+              />
+              <Legend wrapperStyle={{ color: "#cbd5e1" }} />
             </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="bg-white shadow-lg rounded-2xl p-6">
-          <h2 className="text-xl font-semibold mb-4 text-center">
-            Tasks per Assignee
-          </h2>
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={assigneeData}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="Value" fill="#00C49F" />
-            </BarChart>
           </ResponsiveContainer>
         </div>
 
@@ -248,11 +247,55 @@ export default function Analytics() {
                   />
                 ))}
               </Pie>
-              <Tooltip />
-              <Legend />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "rgba(15, 23, 42, 0.95)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: "8px",
+                  color: "#e2e8f0",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                }}
+                labelStyle={{
+                  color: "#e2e8f0",
+                  fontWeight: "600",
+                }}
+                itemStyle={{ color: "#cbd5e1" }}
+              />
+              <Legend wrapperStyle={{ color: "#cbd5e1" }} />
             </PieChart>
           </ResponsiveContainer>
         </div>
+      </div>
+
+      {/* Tasks per Assignee - Full Row */}
+      <div className="bg-white shadow-lg rounded-2xl p-6">
+        <h2 className="text-xl font-semibold mb-4 text-center">
+          Tasks per Assignee
+        </h2>
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={assigneeData}>
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "rgba(15, 23, 42, 0.95)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                borderRadius: "8px",
+                color: "#e2e8f0",
+                fontSize: "14px",
+                fontWeight: 500,
+              }}
+              labelStyle={{
+                color: "#e2e8f0",
+                fontWeight: 600,
+              }}
+              itemStyle={{ color: "#cbd5e1" }}
+            />
+            <Legend wrapperStyle={{ color: "#cbd5e1" }} />
+            <Bar dataKey="Value" fill="#00C49F" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
