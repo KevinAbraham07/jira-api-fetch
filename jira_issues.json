@@ -1,0 +1,184 @@
+{
+  "issues": [
+    {
+      "id": "10033",
+      "key": "AAD-1",
+      "fields": {
+        "summary": "Set up project repository & basic README",
+        "assignee": { "displayName": "Unassigned" },
+        "status": { "name": "Done" },
+        "priority": { "name": "Medium" },
+        "issuetype": { "name": "Task" },
+        "created": "2025-10-24T10:51:01.358+0530"
+      }
+    },
+    {
+      "id": "10036",
+      "key": "AAD-4",
+      "fields": {
+        "summary": "Connect backend to Jira API",
+        "assignee": { "displayName": "ARPIT@GMAIL.COM" },
+        "status": { "name": "Done" },
+        "priority": { "name": "Medium" },
+        "issuetype": { "name": "Task" },
+        "created": "2025-10-24T10:55:28.273+0530"
+      }
+    },
+    {
+      "id": "10035",
+      "key": "AAD-3",
+      "fields": {
+        "summary": "Set up backend (Express + Node)",
+        "assignee": { "displayName": "Kevin R Abraham" },
+        "status": { "name": "Done" },
+        "priority": { "name": "Medium" },
+        "issuetype": { "name": "Story" },
+        "created": "2025-10-24T10:54:15.688+0530"
+      }
+    },
+    {
+      "id": "10034",
+      "key": "AAD-2",
+      "fields": {
+        "summary": "Configure React + Vite frontend",
+        "assignee": { "displayName": "aaron" },
+        "status": { "name": "Done" },
+        "priority": { "name": "Medium" },
+        "issuetype": { "name": "Story" },
+        "created": "2025-10-24T10:53:32.826+0530"
+      }
+    },
+    {
+      "id": "10037",
+      "key": "AAD-5",
+      "fields": {
+        "summary": "Implement authentication using API Token",
+        "assignee": { "displayName": "Kevin R Abraham" },
+        "status": { "name": "To Do" },
+        "priority": { "name": "Medium" },
+        "issuetype": { "name": "Task" },
+        "created": "2025-10-24T10:55:58.875+0530"
+      }
+    },
+    {
+      "id": "10038",
+      "key": "AAD-6",
+      "fields": {
+        "summary": "Parse and clean Jira sprint data",
+        "assignee": { "displayName": "aaron" },
+        "status": { "name": "To Do" },
+        "priority": { "name": "Medium" },
+        "issuetype": { "name": "Task" },
+        "created": "2025-10-24T10:56:33.293+0530"
+      }
+    },
+    {
+      "id": "10039",
+      "key": "AAD-7",
+      "fields": {
+        "summary": "Create reusable chart components (Recharts/D3)",
+        "assignee": { "displayName": "Kevin R Abraham" },
+        "status": { "name": "In Progress" },
+        "priority": { "name": "Medium" },
+        "issuetype": { "name": "Story" },
+        "created": "2025-10-24T11:00:06.445+0530"
+      }
+    },
+    {
+      "id": "10041",
+      "key": "AAD-9",
+      "fields": {
+        "summary": "Design dashboard layout (UI / UX)",
+        "assignee": { "displayName": "aaron" },
+        "status": { "name": "In Progress" },
+        "priority": { "name": "Medium" },
+        "issuetype": { "name": "Story" },
+        "created": "2025-10-24T11:01:29.996+0530"
+      }
+    },
+    {
+      "id": "10040",
+      "key": "AAD-8",
+      "fields": {
+        "summary": "Implement velocity trend visualization",
+        "assignee": { "displayName": "ARPIT@GMAIL.COM" },
+        "status": { "name": "In Progress" },
+        "priority": { "name": "Medium" },
+        "issuetype": { "name": "Task" },
+        "created": "2025-10-24T11:00:46.404+0530"
+      }
+    },
+    {
+      "id": "10044",
+      "key": "AAD-12",
+      "fields": {
+        "summary": "Integrate ML model for sprint velocity prediction",
+        "assignee": { "displayName": "aaron" },
+        "status": { "name": "In Progress" },
+        "priority": { "name": "Medium" },
+        "issuetype": { "name": "Story" },
+        "created": "2025-10-24T11:09:34.164+0530"
+      }
+    },
+    {
+      "id": "10046",
+      "key": "AAD-14",
+      "fields": {
+        "summary": "Fix API response mapping bugs",
+        "assignee": { "displayName": "Kevin R Abraham" },
+        "status": { "name": "In Progress" },
+        "priority": { "name": "Medium" },
+        "issuetype": { "name": "Bug" },
+        "created": "2025-10-24T11:11:01.530+0530"
+      }
+    },
+    {
+      "id": "10042",
+      "key": "AAD-10",
+      "fields": {
+        "summary": "Create cumulative flow diagram",
+        "assignee": { "displayName": "Kevin R Abraham" },
+        "status": { "name": "To Do" },
+        "priority": { "name": "Medium" },
+        "issuetype": { "name": "Task" },
+        "created": "2025-10-24T11:07:48.490+0530"
+      }
+    },
+    {
+      "id": "10043",
+      "key": "AAD-11",
+      "fields": {
+        "summary": "Build resource utilization widget",
+        "assignee": { "displayName": "ARPIT@GMAIL.COM" },
+        "status": { "name": "To Do" },
+        "priority": { "name": "Medium" },
+        "issuetype": { "name": "Task" },
+        "created": "2025-10-24T11:08:20.126+0530"
+      }
+    },
+    {
+      "id": "10045",
+      "key": "AAD-13",
+      "fields": {
+        "summary": "Evaluate risk scoring model",
+        "assignee": { "displayName": "ARPIT@GMAIL.COM" },
+        "status": { "name": "To Do" },
+        "priority": { "name": "Medium" },
+        "issuetype": { "name": "Task" },
+        "created": "2025-10-24T11:10:21.520+0530"
+      }
+    },
+    {
+      "id": "10047",
+      "key": "AAD-15",
+      "fields": {
+        "summary": "Deploy SmartSprint Dashboard to cloud",
+        "assignee": { "displayName": "ARPIT@GMAIL.COM" },
+        "status": { "name": "To Do" },
+        "priority": { "name": "Medium" },
+        "issuetype": { "name": "Story" },
+        "created": "2025-10-24T11:11:37.948+0530"
+      }
+    }
+  ]
+}
