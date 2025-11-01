@@ -15,27 +15,54 @@ import {
 export default function Analytics() {
   const [issues, setIssues] = useState([]);
   const [risk, setRisk] = useState(null);
+  const [predictive, setPredictive] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchData = async () => {
+    try {
+      setRefreshing(true);
+      // Add cache busting timestamp to force fresh data
+      const timestamp = new Date().getTime();
+      const [issuesRes, riskRes, predictiveRes] = await Promise.all([
+        fetch(`http://localhost:5000/jira/issues?t=${timestamp}`),
+        fetch(`http://localhost:5000/jira/risk?t=${timestamp}`),
+        fetch(`http://localhost:5000/jira/predictive?t=${timestamp}`).catch(err => {
+          console.warn("Predictive analysis not available:", err);
+          return { ok: false, json: () => Promise.resolve({ error: "Predictive analysis unavailable" }) };
+        }),
+      ]);
+
+      const issuesData = await issuesRes.json();
+      const riskData = await riskRes.json();
+      let predictiveData = null;
+      
+      if (predictiveRes.ok) {
+        predictiveData = await predictiveRes.json();
+      } else {
+        // If fetch failed, still try to get error message
+        try {
+          predictiveData = await predictiveRes.json();
+        } catch {
+          predictiveData = { 
+            error: "Failed to fetch predictive analysis",
+            success: false 
+          };
+        }
+      }
+
+      setIssues(issuesData.issues || []);
+      setRisk(riskData);
+      setPredictive(predictiveData);
+    } catch (err) {
+      console.error("Failed to fetch analytics data:", err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [issuesRes, riskRes] = await Promise.all([
-          fetch("http://localhost:5000/jira/issues"),
-          fetch("http://localhost:5000/jira/risk"),
-        ]);
-
-        const issuesData = await issuesRes.json();
-        const riskData = await riskRes.json();
-
-        setIssues(issuesData.issues || []);
-        setRisk(riskData);
-      } catch (err) {
-        console.error("Failed to fetch analytics data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, []);
 
@@ -99,9 +126,28 @@ export default function Analytics() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold text-center mb-10">
-        Sprint Insights & Delivery Analytics
-      </h1>
+      <div className="flex justify-between items-center mb-10">
+        <h1 className="text-3xl font-bold">
+          Sprint Insights & Delivery Analytics
+        </h1>
+        <button
+          onClick={fetchData}
+          disabled={refreshing || loading}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+        >
+          {refreshing ? (
+            <>
+              <span className="animate-spin">⟳</span>
+              Refreshing...
+            </>
+          ) : (
+            <>
+              <span>⟳</span>
+              Refresh
+            </>
+          )}
+        </button>
+      </div>
 
       {risk && (
         <div className="max-w-3xl mx-auto mb-10 p-6 bg-white shadow-lg rounded-2xl text-center">
@@ -129,6 +175,127 @@ export default function Analytics() {
           </div>
         </div>
       )}
+
+      {/* Predictive Analysis Section */}
+      <div className="max-w-5xl mx-auto mb-10 p-6 bg-white shadow-lg rounded-2xl">
+        <h2 className="text-2xl font-semibold mb-6 text-center">
+          🤖 Predictive Analysis
+        </h2>
+        
+        {!predictive ? (
+          <div className="text-center py-8 text-gray-500">
+            <p>Loading predictive analysis...</p>
+          </div>
+        ) : predictive.error ? (
+          <div className="text-center py-8 text-red-500">
+            <p className="font-semibold">Error loading predictive analysis</p>
+            <p className="text-sm mt-2">{predictive.error}</p>
+            {predictive.details && (
+              <p className="text-xs mt-1 text-gray-600">{predictive.details}</p>
+            )}
+          </div>
+        ) : predictive.success === false ? (
+          <div className="text-center py-8 text-yellow-600">
+            <p className="font-semibold">Predictive analysis unavailable</p>
+            <p className="text-sm mt-2">The ML model may not be configured or Python dependencies are missing.</p>
+          </div>
+        ) : (
+          <>
+          
+          {/* Model Accuracy and Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl text-center">
+              <p className="text-sm text-gray-600 mb-1">Model Accuracy</p>
+              <p className="text-3xl font-bold text-blue-600">
+                {predictive.accuracy ? (predictive.accuracy * 100).toFixed(1) : "N/A"}%
+              </p>
+            </div>
+            <div className="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-xl text-center">
+              <p className="text-sm text-gray-600 mb-1">At Risk (Delayed)</p>
+              <p className="text-3xl font-bold text-red-600">{predictive.delayed || 0}</p>
+            </div>
+            <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-xl text-center">
+              <p className="text-sm text-gray-600 mb-1">On Track</p>
+              <p className="text-3xl font-bold text-green-600">{predictive.notDelayed || 0}</p>
+            </div>
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-xl text-center">
+              <p className="text-sm text-gray-600 mb-1">Total Issues</p>
+              <p className="text-3xl font-bold text-purple-600">{predictive.totalIssues || 0}</p>
+            </div>
+          </div>
+
+          {/* Delayed Issues Chart */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3">Delay Prediction Distribution</h3>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={[
+                { name: "On Track", value: predictive.notDelayed || 0, color: "#10b981" },
+                { name: "At Risk", value: predictive.delayed || 0, color: "#ef4444" }
+              ]}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "rgba(15, 23, 42, 0.95)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRadius: "8px",
+                    color: "#e2e8f0",
+                  }}
+                />
+                <Bar dataKey="value" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Delayed Issues Table */}
+          {predictive.predictions && predictive.predictions.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold mb-3">
+                Issues Predicted to be Delayed
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="border p-2 text-left">Key</th>
+                      <th className="border p-2 text-left">Summary</th>
+                      <th className="border p-2 text-left">Assignee</th>
+                      <th className="border p-2 text-left">Status</th>
+                      <th className="border p-2 text-left">Age (Days)</th>
+                      <th className="border p-2 text-center">Risk</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {predictive.predictions
+                      .filter(p => p.isDelayed)
+                      .slice(0, 10)
+                      .map((prediction, idx) => (
+                        <tr key={idx} className="hover:bg-gray-50">
+                          <td className="border p-2 font-mono text-sm">{prediction.key}</td>
+                          <td className="border p-2">{prediction.summary}</td>
+                          <td className="border p-2">{prediction.assignee}</td>
+                          <td className="border p-2">{prediction.status}</td>
+                          <td className="border p-2">{prediction.ageDays.toFixed(1)}</td>
+                          <td className="border p-2 text-center">
+                            <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-semibold">
+                              High Risk
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+                {predictive.predictions.filter(p => p.isDelayed).length > 10 && (
+                  <p className="text-sm text-gray-500 mt-2 text-center">
+                    Showing top 10 of {predictive.predictions.filter(p => p.isDelayed).length} at-risk issues
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+          </>
+        )}
+      </div>
 
       {/* Sprint Health Meter */}
       <div className="max-w-3xl mx-auto mb-10 p-6 bg-white shadow-lg rounded-2xl">
