@@ -2,6 +2,15 @@ import express from "express";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
 import cors from "cors";
+import { exec } from "child_process";
+import { promisify } from "util";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
+
+const execAsync = promisify(exec);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -122,6 +131,134 @@ app.get("/jira/risk", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to compute risk score" });
+  }
+});
+
+app.get("/jira/predictive", async (req, res) => {
+  try {
+    const pythonScriptPath = path.join(__dirname, "ml", "predictive_analysis.py");
+    
+    // Execute the Python script from the project root directory
+    // This ensures relative paths work correctly
+    const execOptions = {
+      cwd: __dirname, // Set working directory to project root
+      maxBuffer: 10 * 1024 * 1024 // 10MB buffer for large outputs
+    };
+    
+    // Execute the Python script (try python3 first, fallback to python)
+    let stdout, stderr;
+    try {
+      ({ stdout, stderr } = await execAsync(`python3 "${pythonScriptPath}"`, execOptions));
+    } catch (err) {
+      try {
+        ({ stdout, stderr } = await execAsync(`python "${pythonScriptPath}"`, execOptions));
+      } catch (err2) {
+        // Check if Python dependencies are missing
+        const pythonError = err2.stderr || err2.message || String(err2);
+        if (pythonError.includes("ModuleNotFoundError") || pythonError.includes("No module named")) {
+          throw new Error(`Python dependencies missing. Please install: pip install requests pandas scikit-learn\n\nError: ${pythonError}`);
+        }
+        throw new Error(`Python execution failed. Tried: python3 and python.\n\nError: ${pythonError}`);
+      }
+    }
+    
+    // Check if Python script failed (non-zero exit code or error in stderr)
+    if (stderr && (stderr.includes("[ERROR]") || stderr.includes("ERROR") || stderr.includes("Error") || stderr.includes("Traceback") || stderr.includes("UnicodeEncodeError"))) {
+      console.error("Python script error:", stderr);
+      // If there's a critical error in stderr, treat it as a failure
+      if (stderr.includes("[ERROR]") || stderr.includes("Traceback") || stderr.includes("UnicodeEncodeError")) {
+        throw new Error(`Python script failed:\n${stderr}`);
+      }
+    }
+
+    // Read the JSON predictions file
+    const jsonPath = path.join(__dirname, "predictions.json");
+    const csvPath = path.join(__dirname, "jira_processed.csv");
+    
+    // Try to read JSON first, fallback to CSV if needed
+    let predictionsData = null;
+    
+    if (fs.existsSync(jsonPath)) {
+      const jsonContent = fs.readFileSync(jsonPath, "utf-8");
+      predictionsData = JSON.parse(jsonContent);
+    } else if (fs.existsSync(csvPath)) {
+      // Fallback to CSV parsing if JSON doesn't exist
+      const csvContent = fs.readFileSync(csvPath, "utf-8");
+      const lines = csvContent.trim().split("\n");
+      const headers = lines[0].split(",");
+      
+      const predictions = [];
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(",");
+        const row = {};
+        headers.forEach((header, idx) => {
+          row[header.trim()] = values[idx]?.trim() || "";
+        });
+        predictions.push(row);
+      }
+      
+      predictionsData = {
+        accuracy: null,
+        predictions: predictions
+      };
+    } else {
+      return res.status(500).json({ 
+        error: "Predictive analysis output not found",
+        details: "Neither JSON nor CSV file was generated"
+      });
+    }
+
+    // Extract accuracy from predictions data or stdout
+    let accuracy = predictionsData.accuracy;
+    if (!accuracy) {
+      const accuracyMatch = stdout.match(/Accuracy:\s*([\d.]+)/);
+      if (accuracyMatch) {
+        accuracy = parseFloat(accuracyMatch[1]);
+      }
+    }
+
+    const predictions = predictionsData.predictions || [];
+    
+    // Count delayed vs not delayed (handle both string and numeric)
+    const delayedCount = predictions.filter(p => {
+      const delayed = p.delayed;
+      return delayed === "1" || delayed === 1 || delayed === true;
+    }).length;
+    const notDelayedCount = predictions.length - delayedCount;
+
+    // Map predictions to frontend format
+    const formattedPredictions = predictions.map(p => {
+      const delayed = p.delayed === "1" || p.delayed === 1 || p.delayed === true;
+      return {
+        key: p.key || "",
+        summary: p.summary || "",
+        assignee: p.assignee || "Unassigned",
+        status: p.status || "Unknown",
+        priority: p.priority || "None",
+        ageDays: parseFloat(p.age_days) || 0,
+        isDelayed: delayed,
+        delayedProbability: delayed ? 0.75 : 0.25 // Placeholder
+      };
+    });
+
+    res.json({
+      success: true,
+      accuracy: accuracy,
+      totalIssues: predictions.length,
+      delayed: delayedCount,
+      notDelayed: notDelayedCount,
+      predictions: formattedPredictions,
+      modelOutput: stdout
+    });
+  } catch (err) {
+    console.error("Predictive analysis error:", err);
+    console.error("Error stack:", err.stack);
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to run predictive analysis",
+      details: err.message || String(err),
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
   }
 });
 

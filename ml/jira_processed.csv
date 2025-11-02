@@ -1,0 +1,16 @@
+id,key,summary,assignee,status,priority,issuetype,created,age_days,status_score,assignee_original,priority_original,issuetype_original
+10033,AAD-1,Set up project repository & basic README,2,Done,0,2,2025-10-24 05:21:01.358000+00:00,8,2,Unassigned,Medium,Task
+10036,AAD-4,Connect backend to Jira API,0,Done,0,2,2025-10-24 05:25:28.273000+00:00,8,2,ARPIT@GMAIL.COM,Medium,Task
+10035,AAD-3,Set up backend (Express + Node),1,Done,0,1,2025-10-24 05:24:15.688000+00:00,8,2,Kevin R Abraham,Medium,Story
+10034,AAD-2,Configure React + Vite frontend,3,Done,0,1,2025-10-24 05:23:32.826000+00:00,8,2,aaron,Medium,Story
+10037,AAD-5,Implement authentication using API Token,1,To Do,0,2,2025-10-24 05:25:58.875000+00:00,8,0,Kevin R Abraham,Medium,Task
+10038,AAD-6,Parse and clean Jira sprint data,3,To Do,0,2,2025-10-24 05:26:33.293000+00:00,8,0,aaron,Medium,Task
+10039,AAD-7,Create reusable chart components (Recharts/D3),1,In Progress,0,1,2025-10-24 05:30:06.445000+00:00,8,1,Kevin R Abraham,Medium,Story
+10041,AAD-9,Design dashboard layout (UI / UX),3,In Progress,0,1,2025-10-24 05:31:29.996000+00:00,8,1,aaron,Medium,Story
+10040,AAD-8,Implement velocity trend visualization,0,In Progress,0,2,2025-10-24 05:30:46.404000+00:00,8,1,ARPIT@GMAIL.COM,Medium,Task
+10044,AAD-12,Integrate ML model for sprint velocity prediction,3,In Progress,0,1,2025-10-24 05:39:34.164000+00:00,8,1,aaron,Medium,Story
+10046,AAD-14,Fix API response mapping bugs,1,In Progress,0,0,2025-10-24 05:41:01.530000+00:00,8,1,Kevin R Abraham,Medium,Bug
+10042,AAD-10,Create cumulative flow diagram,1,To Do,0,2,2025-10-24 05:37:48.490000+00:00,8,0,Kevin R Abraham,Medium,Task
+10043,AAD-11,Build resource utilization widget,0,To Do,0,2,2025-10-24 05:38:20.126000+00:00,8,0,ARPIT@GMAIL.COM,Medium,Task
+10045,AAD-13,Evaluate risk scoring model,0,To Do,0,2,2025-10-24 05:40:21.520000+00:00,8,0,ARPIT@GMAIL.COM,Medium,Task
+10047,AAD-15,Deploy SmartSprint Dashboard to cloud,0,To Do,0,1,2025-10-24 05:41:37.948000+00:00,8,0,ARPIT@GMAIL.COM,Medium,Story
